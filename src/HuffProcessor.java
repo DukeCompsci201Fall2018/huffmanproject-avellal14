@@ -125,6 +125,7 @@ public class HuffProcessor {
 	private int[] readForCounts(BitInputStream in) {
 		
 		int [] freq = new int [ALPH_SIZE + 1];
+		freq[PSEUDO_EOF] = 1;
 		
 		while (true){
 			int val = in.readBits(BITS_PER_WORD);
@@ -132,13 +133,13 @@ public class HuffProcessor {
 			freq[val] ++;
 		}
 		
-		freq[PSEUDO_EOF] = 1;
+		
 		return freq;
 	}
 	
 
 	private HuffNode makeTreeFromCounts(int [] cnts) {
-		PriorityQueue<HuffNode> pq = new PriorityQueue<HuffNode>();
+		PriorityQueue<HuffNode> pq = new PriorityQueue<>();
 		
 		
 		for(int i = 0; i < cnts.length; i ++) {
@@ -204,13 +205,17 @@ public class HuffProcessor {
 		
 		while (true) {
 			int val = in.readBits(BITS_PER_WORD);
-			if (val == -1) {
-				String code = encoding[PSEUDO_EOF];
-				out.writeBits(code.length(), Integer.parseInt(code,2));
+			
+			if (val != -1) {
+				String code = encoding[val];
+			    out.writeBits(code.length(), Integer.parseInt(code,2));
 				break;
 			}
-		    String code = encoding[val];
-		    out.writeBits(code.length(), Integer.parseInt(code,2));
+			
+			else {
+				String code = encoding[PSEUDO_EOF];
+				out.writeBits(code.length(), Integer.parseInt(code,2));
+			}
 		}
 		
 		
