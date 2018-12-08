@@ -143,7 +143,8 @@ public class HuffProcessor {
 		
 		
 		for(int i = 0; i < cnts.length; i ++) {
-			if(cnts[i] > 0) pq.add(new HuffNode(i, cnts[i]));
+			if(cnts[i] > 0) 
+				pq.add(new HuffNode(i, cnts[i]));
 		}
 		
 		
@@ -153,12 +154,11 @@ public class HuffProcessor {
 		    HuffNode right = pq.remove();
 		    
 		    // create new HuffNode t with weight from left.weight+right.weight and left, right subtrees
-		    HuffNode t = new HuffNode(0, left.myWeight + right.myWeight);
+		    HuffNode t = new HuffNode(0, left.myWeight + right.myWeight, left, right);
 		    pq.add(t);
 		}
 		
 		HuffNode root = pq.remove();
-
 		return root;
 		
 	}
@@ -172,7 +172,9 @@ public class HuffProcessor {
 	
 	private void encodingHelper(HuffNode root, String encodedPath, String [] encodings) {
 		
-		if(root == null) return;
+		if(root == null) {
+			return;
+		}
 		
 		if(root.myLeft == null && root.myRight == null) {
 			encodings[root.myValue] = encodedPath;
