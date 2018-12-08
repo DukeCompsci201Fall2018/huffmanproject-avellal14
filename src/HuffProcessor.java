@@ -72,13 +72,6 @@ public class HuffProcessor {
 		readCompressedBits(root, in, out);
 		out.close();
 		
-		
-		while (true){
-			int val = in.readBits(BITS_PER_WORD);
-			if (val == -1) break;
-			out.writeBits(BITS_PER_WORD, val);
-		}
-		out.close();
 	}
 	
 	
@@ -148,7 +141,9 @@ public class HuffProcessor {
 		PriorityQueue<HuffNode> pq = new PriorityQueue<HuffNode>();
 		
 		
-		for(int i = 0; i < cnts.length; i ++) if(cnts[i] > 0) pq.add(new HuffNode(i, cnts[i], null, null));
+		for(int i = 0; i < cnts.length; i ++) {
+			if(cnts[i] > 0) pq.add(new HuffNode(i, cnts[i]));
+		}
 		
 		
 
@@ -176,6 +171,8 @@ public class HuffProcessor {
 	
 	private void encodingHelper(HuffNode root, String encodedPath, String [] encodings) {
 		
+		if(root == null) return;
+		
 		if(root.myLeft == null && root.myRight == null) {
 			encodings[root.myValue] = encodedPath;
 			return;
@@ -189,6 +186,7 @@ public class HuffProcessor {
 	
 	private void writeHeader(HuffNode root, BitOutputStream out) {
 	
+		if(root == null) return;
 		if(root.myLeft == null && root.myRight == null) {
 			out.writeBits(1,1);
 			out.writeBits(BITS_PER_WORD + 1, root.myValue);
@@ -206,15 +204,17 @@ public class HuffProcessor {
 		
 		while (true) {
 			int val = in.readBits(BITS_PER_WORD);
-			if (val == -1) break;
-			System.out.println("YEET VAL: "+ val);
+			if (val == -1) {
+				String code = encoding[PSEUDO_EOF];
+				out.writeBits(code.length(), Integer.parseInt(code,2));
+				break;
+			}
 		    String code = encoding[val];
 		    out.writeBits(code.length(), Integer.parseInt(code,2));
 		}
 		
 		
-		String code = encoding[PSEUDO_EOF];
-		out.writeBits(code.length(), Integer.parseInt(code,2));
+		
 		
 	}
 	
